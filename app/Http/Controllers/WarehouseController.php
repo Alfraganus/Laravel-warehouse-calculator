@@ -10,7 +10,7 @@ use SebastianBergmann\CodeCoverage\Report\Xml\Project;
 class WarehouseController extends Controller
 {
     public $koylak = 30;
-    public $number = 48;
+    public $number = 65;
     public $remainder = 0;
     public $timesCalled = 0;
 
@@ -33,6 +33,9 @@ class WarehouseController extends Controller
         $goods = [];
         $warehouse = Warehouse::where(['material_id' => 1])->get();
         foreach ($warehouse as $house) {
+            if($this->remainder == $this->number) {
+                continue;
+            }
             if ($house->remainder <= $this->number) {
                 $this->remainder+=$house->remainder;
                 $goods[] = array(
