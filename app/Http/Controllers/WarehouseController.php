@@ -15,7 +15,7 @@ class WarehouseController extends Controller
     public $timesCalled = 0;
 
 
-    public function index()
+    public function index(Request $request)
     {
         $mato = 24; //kg
         $model = Warehouse::all();
@@ -24,14 +24,27 @@ class WarehouseController extends Controller
         return $model;
     }
 
-    public function recursive()
+
+    public function getMaterials(Request $request)
+    {
+        $datas = $request['material'];
+         foreach ($datas as $id) {
+             $test[] = $this->recursive($id);
+             $this->remainder=0;
+         }
+         return $test;
+    }
+
+
+
+    public function recursive($id)
     {
         $all = DB::table('warehouse')
-            ->where('material_id', '=', 1)
+            ->where('material_id', '=', $id)
             ->sum('remainder');
 
         $goods = [];
-        $warehouse = Warehouse::where(['material_id' => 1])->get();
+        $warehouse = Warehouse::where(['material_id' => $id])->get();
         foreach ($warehouse as $house) {
             if($this->remainder == $this->number) {
                 continue;
@@ -39,7 +52,7 @@ class WarehouseController extends Controller
             if ($house->remainder <= $this->number) {
                 $this->remainder+=$house->remainder;
                 $goods[] = array(
-                    'product'=>'koylak',
+                    'material'=>$house->material_id,
                     'quantity'=>$house->remainder,
                     'price'=>$house->price
                 );
@@ -49,7 +62,7 @@ class WarehouseController extends Controller
                 $house->remainder -=$the_remaining;
                 $this->remainder+=$the_remaining;
                 $goods[] = array(
-                    'product'=>'koylak',
+                    'material'=>$house->material_id,
                     'quantity'=>$the_remaining,
                     'price'=>$house->price
                 );
@@ -58,12 +71,11 @@ class WarehouseController extends Controller
         }
         if ($all < $this->number) {
             $goods[] = array(
-                'product'=>'koylak',
-                'quantity'=>$this->number-$all,
+                'material'=>$house->material_id,
+                'quantity'=>$this->number - $all,
                 'price'=>null
             );
         }
-        echo "<pre>";
-         var_dump(print_r($goods));
+         return $goods;
     }
 }

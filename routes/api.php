@@ -13,11 +13,13 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::post('/test','WarehouseController@getMaterials');
+
 
 Route::get('/warehouse/calculate', 'WarehouseController@index');
-Route::get('/test', 'WarehouseController@recursive');
+Route::get('/applications/edit/{id}', 'ApplicationController@show');
+//Route::get('/test/editcha/{id}', 'WarehouseController@index');
 Route::group(['middleware' => ['api']], function () {
-Route::get('applications/edit/{id}', 'ApplicationController@show');
 Route::post('applications/get-ref', 'ApplicationController@getRef');
 Route::post('applications/update', 'ApplicationController@update');
 Route::delete('applications/delete/{id}', 'ApplicationController@destroy');
