@@ -71,7 +71,7 @@ class WarehouseController extends Controller
     }
 
 
-    public function getMaterials($product_id,$quantity=50)
+    public function getMaterials($product_id,$quantity=500)
     {
         $productMaterials = ProductMaterials::where(['product_id'=>$product_id])->get();
 
@@ -121,7 +121,7 @@ class WarehouseController extends Controller
                     'left_in_warehouse'=>$material->remainder,
                     'now_avaiblable'=>$result['now_avaiblable']
                 );
-                unset($materials_in_warehouse[0]);
+//                unset($materials_in_warehouse[0]);
             } elseif ($material->remainder >= $necessary_quantity) {
                 // kerakli miqdorni ajratib olamiz, oldin olingan bolsa, uni hisobga olamiz
                 $quantity_to_be_taken = $necessary_quantity - $result['now_avaiblable'];
@@ -137,18 +137,18 @@ class WarehouseController extends Controller
             }
 
         }
-        /*if($current_quantity < $necessary_quantity) {
+        if($result['now_avaiblable']  < $necessary_quantity) {
             $result[] = array(
                 'warehouse_id'=>null,
                 'material_id'=>$material->material_name->material_name,
-                'need_quantity'=>$necessary_quantity - $current_quantity,
+                'need_quantity'=>$necessary_quantity - $result['now_avaiblable'] ,
                 'price'=>null,
             );
-        }*/
+        }
 
         return [
-//            'result'=>$result,
-            'model'=>$materials_in_warehouse
+            'result'=>$result,
+//            'model'=>$materials_in_warehouse
         ];
     }
 
