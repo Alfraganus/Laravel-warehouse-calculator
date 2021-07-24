@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Application;
 use App\ApplicationDetail;
 use App\Component;
+use App\models\Warehouse;
 use App\Supplier;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -16,6 +17,63 @@ class ApplicationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    //material_id = xomashyo, $quantity = miqdori
+    public function getMaterials($material_id, $necessary_quantity)
+    {
+        $current_quantity = 0;
+        $result = array(
+            'warehouse_id'=>null,
+            'material_id'=>null,
+            'taken_quantity'=>null,
+            'price'=>null,
+        );
+
+        $materials_in_warehouse = Warehouse::where(['material_id' => $material_id])->get();
+
+        /*ombordagi kerakli xomashyolarni chiqarib olamiz*/
+        foreach ($materials_in_warehouse as &$material) {
+
+            if($current_quantity == $necessary_quantity) {
+                continue;
+            }
+
+            /*agar bazada biz soragan qatorda yetarli miqdor topilmasa*/
+            if ($material->remainder < $necessary_quantity) {
+                $current_quantity += $material->remainder;
+                $material->remainder=0;
+                $result['warehouse_id'] =$material->id;
+                $result['material_id'] =$material->material_id;
+                $result['taken_quantity'] =$current_quantity;
+                $result['price'] =$material->price;
+
+            } elseif ($material->remainder >= $necessary_quantity) {
+                // kerakli miqdorni ajratib olamiz, oldin olingan bolsa, uni hisobga olamiz
+                $quantity_to_be_taken = $necessary_quantity - $current_quantity;
+                $current_quantity+=$quantity_to_be_taken;
+                $material->remainder-=$quantity_to_be_taken;
+
+                $result['warehouse_id'] =$material->id;
+                $result['material_id'] =$material->material_id;
+                $result['taken_quantity'] =$quantity_to_be_taken;
+                $result['price'] =$material->price;
+            }
+        }
+            return $result;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
     public function index(Request $request)
     {
         $page = $request->input('pagination')['page'];
