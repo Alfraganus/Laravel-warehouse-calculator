@@ -17,32 +17,9 @@ class WarehouseController extends Controller
 {
     public $array = array();
 
-    public function test() {
-        $this->array = array(
-            'ip' => ['count' => 10, 'price'=> 100],
-            'mato' => ['count' => 50, 'price'=> 150],
-        );
 
-        $ishlab_chiqarish =  array(
-            'koylak' => [
-                'ip' => 5,
-                'mato' => 50,
-            ],
-            'shim' => [
-                'ip' => 10,
-                'mato' => 50,
-            ],
-        );
 
-        $maxsulot_count = 10;
-        $count = $this->array['ip']['count'];
-
-        if ($maxsulot_count > $count) {
-            $this->array['ip']['count'] = $count - $maxsulot_count;
-        }
-    }
-
-    public function getMaterials($product_id=1,$quantity=80)
+    public function getMaterials($product_id=1,$quantity=30)
     {
         $productMaterials = ProductMaterials::where(['product_id'=>$product_id])->get();
         foreach ($productMaterials as &$material) {
@@ -77,15 +54,16 @@ class WarehouseController extends Controller
 
             /*agar bazada biz soragan qatorda yetarli miqdor topilmasa*/
             if ($material->remainder < $necessary_quantity) {
-                    if($result['now_avaiblable'] > 0) {
-                        $quantity_to_be_taken = (($necessary_quantity-$result['now_avaiblable'])) ;
-                    } else {
-                        $quantity_to_be_taken = ($material->remainder - $result['now_avaiblable']);
-
-                    }
+                $theNeed = $necessary_quantity - $result['now_avaiblable'];
+                if($material->remainder >= $theNeed)  {
+                    $quantity_to_be_taken = $necessary_quantity-$result['now_avaiblable'];
+                } else {
+                    $quantity_to_be_taken = $material->remainder;
+                }
                 $result['now_avaiblable'] += $quantity_to_be_taken;
                 $result[] = array(
                     'test'=>$quantity_to_be_taken,
+                    'need'=>$theNeed,
                     'warehouse_id'=>$material->id,
                     'material_id'=>$material->material_name->material_name,
                     'taken_quantity'=>$quantity_to_be_taken,
@@ -120,6 +98,32 @@ class WarehouseController extends Controller
         ];
     }
 
+
+    /*variant 2,*/
+    public function test() {
+        $this->array = array(
+            'ip' => ['count' => 10, 'price'=> 100],
+            'mato' => ['count' => 50, 'price'=> 150],
+        );
+
+        $ishlab_chiqarish =  array(
+            'koylak' => [
+                'ip' => 5,
+                'mato' => 50,
+            ],
+            'shim' => [
+                'ip' => 10,
+                'mato' => 50,
+            ],
+        );
+
+        $maxsulot_count = 10;
+        $count = $this->array['ip']['count'];
+
+        if ($maxsulot_count > $count) {
+            $this->array['ip']['count'] = $count - $maxsulot_count;
+        }
+    }
 
 
 
