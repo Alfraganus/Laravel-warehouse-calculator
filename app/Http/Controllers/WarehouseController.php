@@ -2,12 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Material;
 use App\models\Materials;
-use App\Models\Product;
-use App\Models\ProductMaterial;
 use App\models\ProductMaterials;
-use App\models\Products;
 use App\models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,24 +14,26 @@ class WarehouseController extends Controller
     public $array = array();
 
 
-
-    public function getMaterials($product_id=1,$quantity=30)
+    public function getMaterials(Request $request)
     {
-        $productMaterials = ProductMaterials::where(['product_id'=>$product_id])->get();
+
+        $product_id = $request['product_id'];
+        $quantity = $request['quantity'];
+        $productMaterials = ProductMaterials::where(['product_id' => $product_id])->get();
         foreach ($productMaterials as &$material) {
             $product_name = $material->product_name->product_code;
-            $result[] = $this->getMaterialsCompound($material->material_id,$material->quantity * $quantity);
+            $result[] = $this->getMaterialsCompound($material->material_id, $material->quantity * $quantity);
             $important_materials[] = array(
-                'materials'=>$material->material_name->material_name,
-                'quantity'=>$material->quantity*$quantity
+                'materials' => $material->material_name->material_name,
+                'quantity' => $material->quantity * $quantity
             );
         }
-          return [
-              'product'=>$product_name,
-              'quantity'=>$quantity,
-              'important_materials'=>$important_materials,
-              'result'=>$result
-          ];
+        return [
+            'product' => $product_name,
+            'quantity' => $quantity,
+            'important_materials' => $important_materials,
+            'result' => $result
+        ];
     }
 
 

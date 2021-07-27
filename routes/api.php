@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('/test/{product_id}','WarehouseController@getMaterials');
+Route::get('/start/{product_id}','WarehouseController@getMaterials');
 Route::get('/test2','WarehouseController@multipleProducts');
 Route::get('/test3','WarehouseController@getCalculations');
 
